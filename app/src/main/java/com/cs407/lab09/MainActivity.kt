@@ -68,7 +68,9 @@ fun GameScreen(viewModel: BallViewModel) {
     }
 
     val gravitySensor = remember {
-        sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        val sensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY)
+        android.util.Log.d("GameScreen", "Gravity sensor available: ${sensor != null}")
+        sensor
     }
 
     // This effect runs when the composable enters the screen
@@ -77,6 +79,7 @@ fun GameScreen(viewModel: BallViewModel) {
         val listener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent?) {
                 event?.let {
+                    android.util.Log.d("GameScreen", "Sensor data: x=${it.values[0]}, y=${it.values[1]}, z=${it.values[2]}")
                     viewModel.onSensorDataChanged(it)
                 }
             }
@@ -86,7 +89,10 @@ fun GameScreen(viewModel: BallViewModel) {
         }
 
         if (gravitySensor != null) {
-            sensorManager.registerListener(listener, gravitySensor, SensorManager.SENSOR_DELAY_GAME)
+            val registered = sensorManager.registerListener(listener, gravitySensor, SensorManager.SENSOR_DELAY_GAME)
+            android.util.Log.d("GameScreen", "Sensor listener registered: $registered")
+        } else {
+            android.util.Log.e("GameScreen", "Gravity sensor is null, cannot register listener")
         }
 
         onDispose {

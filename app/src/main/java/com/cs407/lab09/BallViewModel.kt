@@ -33,7 +33,10 @@ class BallViewModel : ViewModel() {
      */
     fun onSensorDataChanged(event: SensorEvent) {
         // Ensure ball is initialized
-        val currentBall = ball ?: return
+        val currentBall = ball ?: run {
+            android.util.Log.w("BallViewModel", "Ball not initialized yet")
+            return
+        }
 
         if (event.sensor.type == Sensor.TYPE_GRAVITY) {
             if (lastTimestamp != 0L) {
@@ -47,6 +50,9 @@ class BallViewModel : ViewModel() {
                 )
 
                 _ballPosition.update { Offset(currentBall.posX, currentBall.posY) }
+                android.util.Log.d("BallViewModel", "Ball position updated: (${currentBall.posX}, ${currentBall.posY})")
+            } else {
+                android.util.Log.d("BallViewModel", "First sensor event, initializing timestamp")
             }
 
             lastTimestamp = event.timestamp
